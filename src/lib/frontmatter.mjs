@@ -55,7 +55,8 @@ function parseList(lines, start, file) {
 
   while (i < lines.length) {
     const line = lines[i];
-    if (!line.trim()) { i++; continue; }
+    // 빈 줄과 메모(#)는 목록을 끊지 않는다
+    if (!line.trim() || line.trim().startsWith('#')) { i++; continue; }
 
     const ind = indentOf(line);
     if (ind !== baseIndent || !/^\s*-\s/.test(line)) break;
@@ -70,7 +71,7 @@ function parseList(lines, start, file) {
       // 같은 항목에 딸린 추가 칸들 (더 깊은 들여쓰기, 대시 없음)
       while (i < lines.length) {
         const l2 = lines[i];
-        if (!l2.trim()) { i++; continue; }
+        if (!l2.trim() || l2.trim().startsWith('#')) { i++; continue; }
         if (indentOf(l2) <= baseIndent || /^\s*-\s/.test(l2)) break;
         const kv2 = /^\s*([A-Za-z_][\w-]*):\s*(.*)$/.exec(l2);
         if (!kv2) {
