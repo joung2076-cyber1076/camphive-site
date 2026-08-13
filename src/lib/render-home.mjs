@@ -33,7 +33,11 @@ export function renderHome(page, ctx) {
   }
 
   // 콘텐츠 목록 — 공개된 페이지
-  const others = (allPages ?? []).filter((p) => p.type !== 'home' && !p.template);
+  // 콘텐츠 목록에는 본문 문서만 넣는다.
+  // 견본(template)과 법적 고지 페이지(page)는 읽을거리가 아니므로 제외한다.
+  const others = (allPages ?? []).filter(
+    (p) => p.type !== 'home' && p.type !== 'page' && !p.template
+  );
   const listed = others.filter((p) => !p.noindex && !p.draft);
   // 자리표시자(원고 대기) 페이지는 따로 묶어 "준비 중"으로 밝힌다.
   // 없는 척 숨기지 않고, 완성된 글과 섞지도 않는다.

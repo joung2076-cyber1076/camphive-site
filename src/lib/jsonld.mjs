@@ -213,6 +213,10 @@ export function buildGraph(page, ctx) {
 
   if (page.type === 'home') {
     nodes.push(itemListNode(site, allPages, url));
+  } else if (page.type === 'page') {
+    // 일반 페이지 — 본문이 기사(Article)가 아니므로 WebPage와 경로만 남긴다.
+    // 법적 고지문에 Article/FAQPage를 붙이면 AI가 인용 대상 콘텐츠로 오인한다.
+    nodes.push(breadcrumbNode(site, page, url));
   } else {
     nodes.push(articleNode(site, page, url));
     nodes.push(faqNode(site, page, url));

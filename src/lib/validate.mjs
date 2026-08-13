@@ -38,6 +38,14 @@ export function validatePage(page) {
     return { errors, warnings };
   }
 
+  // 일반 페이지(개인정보처리방침·이용약관 등)는 AEO 8단 구조를 요구하지 않는다.
+  // 이런 문서는 AI 인용 대상이 아니라 법적 고지 목적이므로 규격을 강제하면 오히려 방해된다.
+  if (page.type === 'page') {
+    need(Boolean(page.question), 'question(H1 제목)이 비어 있습니다.');
+    need(DATE.test(page.updated ?? ''), 'updated(갱신일)가 없거나 YYYY-MM-DD 형식이 아닙니다.');
+    return { errors, warnings };
+  }
+
   // 1. H1 = 질의문
   need(Boolean(page.question), 'question(H1 질의문)이 비어 있습니다.');
   // 끝의 닫는 따옴표는 무시하고 물음표로 끝나는지 본다.

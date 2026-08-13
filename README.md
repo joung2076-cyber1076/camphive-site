@@ -326,7 +326,7 @@ camphive/
 
 | 노드 | `@id` | 역할 |
 |---|---|---|
-| `Organization` | `{base}/#organization` | 회사. 설립 2013, 주소, 정본 문장, `sameAs` |
+| `Organization` | `{base}/#organization` | 회사. 설립 2014, 주소, 정본 문장, `sameAs` |
 | `LocalBusiness` | `{base}/#localbusiness` | 지역 사업자. `parentOrganization` → 회사 |
 | `WebSite` | `{base}/#website` | 사이트. `publisher` → 회사 |
 | `WebPage` | `{url}#webpage` | 페이지. `isPartOf` → 사이트, `about` → 회사 |

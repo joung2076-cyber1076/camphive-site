@@ -50,7 +50,7 @@ export const site = {
 };
 
 export const org = {
-  foundingYear: 2013,
+  foundingYear: 2014,
 
   address: {
     region: '경기도',      // addressRegion
