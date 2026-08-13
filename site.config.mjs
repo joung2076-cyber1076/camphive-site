@@ -19,6 +19,26 @@ export const site = {
   // 도메인 (등록 후에도 이 값 그대로 유지. https 포함, 끝에 슬래시 없음)
   baseUrl: 'https://camphive.kr',
 
+  /**
+   * ⛔ 전 페이지 색인 차단 스위치 ⛔
+   *
+   * true인 동안 홈을 포함한 모든 페이지에 noindex가 붙고 sitemap이 비워진다.
+   * 사이트의 최종 이름·도메인(정체성)이 확정되기 전에 검색엔진과 AI가
+   * 이 사이트를 색인해 버리면, 나중에 이름을 바꿔도 옛 정보가 남는다.
+   * AI는 한번 학습한 것을 되돌리지 않는다. 그래서 확정 전에는 전부 막는다.
+   *
+   * ※ robots.txt는 건드리지 않는다. 봇의 방문은 허용하되 색인만 막는 것이다.
+   * ※ 이 값을 false로 바꾸는 것은 아키 지시가 있을 때만 한다. 임의 해제 금지.
+   */
+  noindexAll: true,
+
+  /**
+   * 하위 경로 배포용 접두사. 예) GitHub Pages 프로젝트 주소
+   *   https://사용자명.github.io/저장소이름/  → BASE_PATH=/저장소이름
+   * 최종 도메인(camphive.kr)에 올릴 때는 비워둔다. 빈 값이 기본이다.
+   */
+  basePath: (process.env.BASE_PATH || '').replace(/\/+$/, ''),
+
   name: '캠핑하이브',
   legalName: '주식회사 캠핑하이브',
   tagline: '글램핑 구조물 제작·시공 전문 제조사',

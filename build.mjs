@@ -67,9 +67,14 @@ function buildRobotsTxt() {
   ].join('\n');
 }
 
+/** 색인 대상 = 전역 차단이 꺼져 있고, 자리표시자도 아닌 페이지 */
+export function indexablePages(pages) {
+  if (site.noindexAll) return [];
+  return pages.filter((p) => !p.noindex && !p.draft);
+}
+
 function buildSitemap(pages) {
-  const entries = pages
-    .filter((p) => !p.noindex && !p.draft)
+  const entries = indexablePages(pages)
     .map((p) => {
       const url = urlFor(site.baseUrl, p.slug);
       const priority = p.type === 'home' ? '1.0' : '0.8';
@@ -167,9 +172,16 @@ async function main() {
   await writeFile(path.join(DIST, 'robots.txt'), buildRobotsTxt(), 'utf8');
   console.log(`  ${C.ok('생성')}  robots.txt  ${C.dim(`${bots.search.length + bots.training.length + bots.classic.length}개 봇 허용`)}`);
 
-  const indexed = pages.filter((p) => !p.noindex && !p.draft);
+  const indexed = indexablePages(pages);
   await writeFile(path.join(DIST, 'sitemap.xml'), buildSitemap(pages), 'utf8');
   console.log(`  ${C.ok('생성')}  sitemap.xml  ${C.dim(`${indexed.length}개 URL`)}`);
+  if (site.noindexAll) {
+    console.log(
+      C.warn('\n  ⛔ site.noindexAll = true — 전 페이지 색인 차단 중입니다.') +
+        C.dim('\n     홈을 포함한 모든 페이지에 noindex가 붙고 sitemap이 비어 있습니다.') +
+        C.dim('\n     해제는 아키 지시가 있을 때만 site.config.mjs에서 합니다.')
+    );
+  }
 
   await copyFile(path.join(ROOT, 'src', 'styles.css'), path.join(DIST, 'styles.css'));
   console.log(`  ${C.ok('생성')}  styles.css`);

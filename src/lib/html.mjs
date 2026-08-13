@@ -1,6 +1,8 @@
 // HTML 조립 헬퍼. 콘텐츠는 전부 평문(plain text)으로 받아 이스케이프한다.
 // → 원고에 <, & 같은 글자가 들어가도 페이지가 깨지지 않는다.
 
+import { site } from '../../site.config.mjs';
+
 export function esc(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -28,10 +30,18 @@ export function urlFor(baseUrl, slug) {
   return s ? `${baseUrl}/${s}/` : `${baseUrl}/`;
 }
 
-/** 슬러그 → 사이트 내부 경로 (href용) */
+/**
+ * 슬러그 → 사이트 내부 경로 (href용)
+ * 하위 경로 배포(basePath)가 설정돼 있으면 앞에 붙인다.
+ */
 export function pathFor(slug) {
   const s = String(slug ?? '').replace(/^\/+|\/+$/g, '');
-  return s ? `/${s}/` : '/';
+  return s ? `${site.basePath}/${s}/` : `${site.basePath}/`;
+}
+
+/** 정적 파일(css 등) 경로. basePath를 반영한다. */
+export function assetPath(file) {
+  return `${site.basePath}/${String(file).replace(/^\/+/, '')}`;
 }
 
 /**

@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import { CANONICAL_SENTENCE } from '../../site.config.mjs';
-import { esc, urlFor, pathFor, krDate } from './html.mjs';
+import { esc, urlFor, pathFor, assetPath, krDate } from './html.mjs';
 import { renderJsonLd } from './jsonld.mjs';
 
 function head(page, ctx, graph) {
@@ -15,8 +15,10 @@ function head(page, ctx, graph) {
   const title = page.metaTitle ?? page.title ?? page.question ?? site.name;
   const desc = page.description ?? site.description;
 
-  // noindex 페이지(템플릿 등)는 색인에서 제외한다.
-  const robots = page.noindex
+  // 색인 차단 조건은 두 가지.
+  //  1) site.noindexAll — 사이트 정체성 확정 전 전 페이지 차단 (아키 지시로만 해제)
+  //  2) page.noindex    — 자리표시자·견본 등 개별 페이지 차단
+  const robots = site.noindexAll || page.noindex
     ? 'noindex, nofollow'
     : 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
 
@@ -46,8 +48,8 @@ ${page.published ? `<meta property="article:published_time" content="${esc(page.
 <meta name="geo.region" content="KR-41">
 <meta name="geo.placename" content="${esc(org.address.locality)}">
 
-<link rel="stylesheet" href="/styles.css">
-<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="stylesheet" href="${assetPath('styles.css')}">
+<link rel="sitemap" type="application/xml" href="${assetPath('sitemap.xml')}">
 
 ${renderJsonLd(graph)}`;
 }
@@ -64,7 +66,7 @@ function header(page, ctx) {
 
   return `<header class="site-header">
   <div class="wrap">
-    <a class="brand" href="/">
+    <a class="brand" href="${esc(pathFor(''))}">
       <span class="brand-name">${esc(site.name)}</span>
       <span class="brand-sub">${esc(site.tagline)}</span>
     </a>

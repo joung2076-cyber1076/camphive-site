@@ -163,6 +163,15 @@ async function main() {
       '정본 문장이 소스에 글자 단위로 존재'
     );
 
+    // 3-1) 전역 색인 차단이 켜져 있으면 예외 없이 noindex여야 한다
+    if (site.noindexAll) {
+      check(
+        /<meta name="robots" content="noindex, nofollow">/.test(raw),
+        '색인 차단(noindex, nofollow) 적용됨',
+        '전역 차단 중'
+      );
+    }
+
     // 4) JSON-LD 유효성 + @graph 연결
     const ldMatch = raw.match(
       /<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/i
@@ -211,9 +220,11 @@ async function main() {
     check(textOnly.length > 300, '렌더링 없이 읽히는 본문 분량', `${textOnly.length}자`);
 
     // 6) 내부 링크가 실제 페이지를 가리키는가
+    //    하위 경로 배포(basePath)가 걸려 있으면 떼어내고 대조한다
     const internal = [...raw.matchAll(/href="(\/[^"#?]*)"/g)]
       .map((m) => m[1])
-      .filter((h) => !/\.(css|xml|txt|png|jpg|svg|ico|webp)$/i.test(h));
+      .filter((h) => !/\.(css|xml|txt|png|jpg|svg|ico|webp)$/i.test(h))
+      .map((h) => (site.basePath && h.startsWith(site.basePath) ? h.slice(site.basePath.length) || '/' : h));
     const broken = [...new Set(internal)].filter((h) => !slugs.has(h.endsWith('/') ? h : `${h}/`));
     check(broken.length === 0, `내부 링크 유효 (${[...new Set(internal)].length}개)`,
       broken.length ? `깨짐: ${broken.join(', ')}` : '');
@@ -242,8 +253,12 @@ async function main() {
   if (check(existsSync(sitemapPath), 'sitemap.xml 존재')) {
     const sitemap = await readFile(sitemapPath, 'utf8');
     const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    const indexable = pages.filter((p) => !p.noindex && !p.draft);
-    check(locs.length === indexable.length, `sitemap URL 수 == 색인 대상 페이지 수`, `${locs.length}개`);
+    const indexable = site.noindexAll ? [] : pages.filter((p) => !p.noindex && !p.draft);
+    check(
+      locs.length === indexable.length,
+      `sitemap URL 수 == 색인 대상 페이지 수`,
+      site.noindexAll ? `${locs.length}개 (전역 색인 차단 중이므로 0이어야 정상)` : `${locs.length}개`
+    );
     check(
       locs.every((l) => l.startsWith(site.baseUrl)),
       `모든 URL 이 ${site.baseUrl} 절대경로`
